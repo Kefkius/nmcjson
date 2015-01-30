@@ -7,6 +7,304 @@ import (
 	"github.com/btcsuite/btcjson"
 )
 
+// NameNewCmd is a type handling custom marshaling and
+// unmarshaling of name_new JSON RPC commands.
+type NameNewCmd struct {
+	id   interface{}
+	Name string
+}
+
+// Enforce that NameNewCmd satisfies the Cmd interface.
+var _ btcjson.Cmd = &NameNewCmd{}
+
+// NewNameNewCmd creates a new NameNewCmd.
+func NewNameNewCmd(id interface{}, name string) (*NameNewCmd, error) {
+	return &NameNewCmd{
+		id:   id,
+		Name: name,
+	}, nil
+}
+
+// NameNewFromRaw is a RawCmdParser.
+func NameNewFromRaw(rawCmd *btcjson.RawCmd) (btcjson.Cmd, error) {
+	var name string
+	err := json.Unmarshal(rawCmd.Params[0], &name)
+	if err != nil {
+		return NameNewCmd{}, err
+	}
+	return NewNameNewCmd(rawCmd.Id, name)
+}
+
+// Id satisfies the Cmd interface by returning the id of the command.
+func (cmd NameNewCmd) Id() interface{} {
+	return cmd.id
+}
+
+// Method satisfies the Cmd interface by returning the json method.
+func (cmd NameNewCmd) Method() string {
+	return "name_new"
+}
+
+// MarshalJSON returns the JSON encoding of cmd. Part of the Cmd interface.
+func (cmd NameNewCmd) MarshalJSON() ([]byte, error) {
+	params := []interface{}{
+		cmd.Name,
+	}
+	raw, err := btcjson.NewRawCmd(cmd.id, cmd.Method(), params)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(raw)
+}
+
+// UnmarshalJSON unmarshals the JSON encoding of cmd into cmd. Part of the Cmd interface.
+func (cmd NameNewCmd) UnmarshalJSON(b []byte) error {
+	var r btcjson.RawCmd
+	if err := json.Unmarshal(b, &r); err != nil {
+		return err
+	}
+
+	if len(r.Params) != 1 {
+		return btcjson.ErrWrongNumberOfParams
+	}
+
+	newCmd, err := NameNewFromRaw(&r)
+	if err != nil {
+		return err
+	}
+	cmd = newCmd.(NameNewCmd)
+	return nil
+}
+
+// NameUpdateCmd is a type handling custom marshaling and
+// unmarshaling of name_update JSON RPC commands.
+type NameUpdateCmd struct {
+	id        interface{}
+	Name      string
+	Value     string
+	ToAddress string
+}
+
+// Enforce that NameUpdateCmd satisfies the Cmd interface.
+var _ btcjson.Cmd = &NameUpdateCmd{}
+
+// NewNameUpdateCmd creates a new NameUpdateCmd.
+func NewNameUpdateCmd(id interface{}, name string, value string, optArgs ...interface{}) (*NameUpdateCmd, error) {
+	var toAddress string
+	if len(optArgs) > 1 {
+		return nil, btcjson.ErrWrongNumberOfParams
+	}
+
+	if len(optArgs) > 0 {
+		a, ok := optArgs[0].(string)
+		if !ok {
+			return nil, errors.New("optional argument toaddress is not a string")
+		}
+		toAddress = a
+	}
+	return &NameUpdateCmd{
+		id:        id,
+		Name:      name,
+		Value:     value,
+		ToAddress: toAddress,
+	}, nil
+}
+
+// NameUpdateFromRaw is a RawCmdParser.
+func NameUpdateFromRaw(rawCmd *btcjson.RawCmd) (btcjson.Cmd, error) {
+	var name string
+	var value string
+	var toAddress string
+	params := make([]interface{}, 0, 1)
+	err := json.Unmarshal(rawCmd.Params[0], &name)
+	if err != nil {
+		return NameUpdateCmd{}, err
+	}
+	err = json.Unmarshal(rawCmd.Params[1], &value)
+	if err != nil {
+		return NameUpdateCmd{}, err
+	}
+	if len(rawCmd.Params) > 2 {
+		err = json.Unmarshal(rawCmd.Params[2], &toAddress)
+		if err != nil {
+			return NameUpdateCmd{}, err
+		}
+		params = append(params, toAddress)
+	}
+
+	return NewNameUpdateCmd(rawCmd.Id, name, value, params)
+}
+
+// Id satisfies the Cmd interface by returning the id of the command.
+func (cmd NameUpdateCmd) Id() interface{} {
+	return cmd.id
+}
+
+// Method satisfies the Cmd interface by returning the json method.
+func (cmd NameUpdateCmd) Method() string {
+	return "name_update"
+}
+
+// MarshalJSON returns the JSON encoding of cmd. Part of the Cmd interface.
+func (cmd NameUpdateCmd) MarshalJSON() ([]byte, error) {
+	params := make([]interface{}, 0, 3)
+	params = append(params, cmd.Name)
+	params = append(params, cmd.Value)
+	if cmd.ToAddress != "" {
+		params = append(params, cmd.ToAddress)
+	}
+	raw, err := btcjson.NewRawCmd(cmd.id, cmd.Method(), params)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(raw)
+}
+
+// UnmarshalJSON unmarshals the JSON encoding of cmd into cmd. Part of the Cmd interface.
+func (cmd NameUpdateCmd) UnmarshalJSON(b []byte) error {
+	var r btcjson.RawCmd
+	if err := json.Unmarshal(b, &r); err != nil {
+		return err
+	}
+	if len(r.Params) > 3 || len(r.Params) < 2 {
+		return btcjson.ErrWrongNumberOfParams
+	}
+
+	newCmd, err := NameUpdateFromRaw(&r)
+	if err != nil {
+		return err
+	}
+	cmd = newCmd.(NameUpdateCmd)
+	return nil
+}
+
+// NameFirstUpdateCmd is a type handling custom marshaling and
+// unmarshaling of name_firstupdate JSON RPC commands.
+type NameFirstUpdateCmd struct {
+	id        interface{}
+	Name      string
+	Rand      string
+	Txid      string
+	Value     string
+	ToAddress string
+}
+
+// Enforce that NameFirstUpdateCmd satisfies the Cmd interface.
+var _ btcjson.Cmd = &NameFirstUpdateCmd{}
+
+// NewNameFirstUpdateCmd creates a new NameFirstUpdateCmd.
+func NewNameFirstUpdateCmd(id interface{}, name, rand, value string, optArgs ...interface{}) (*NameFirstUpdateCmd, error) {
+	var txId string
+	var toAddress string
+	if len(optArgs) > 2 {
+		return nil, btcjson.ErrWrongNumberOfParams
+	}
+
+	if len(optArgs) > 0 {
+		a, ok := optArgs[0].(string)
+		if !ok {
+			return nil, errors.New("optional argument txid is not a string")
+		}
+		txId = a
+	}
+	if len(optArgs) > 1 {
+		b, ok := optArgs[1].(string)
+		if !ok {
+			return nil, errors.New("optional argument toaddress is not a string")
+		}
+		toAddress = b
+	}
+	return &NameFirstUpdateCmd{
+		Name:      name,
+		Rand:      rand,
+		Txid:      txId,
+		Value:     value,
+		ToAddress: toAddress,
+	}, nil
+
+}
+
+// NameFirstUpdateFromRaw is a RawCmdParser.
+func NameFirstUpdateFromRaw(rawCmd *btcjson.RawCmd) (btcjson.Cmd, error) {
+	var name string
+	var rand string
+	var value string
+	var txId string
+	var toAddress string
+	params := make([]interface{}, 0, 2)
+	if err := json.Unmarshal(rawCmd.Params[0], &name); err != nil {
+		return NameFirstUpdateCmd{}, err
+	}
+	if err := json.Unmarshal(rawCmd.Params[1], &rand); err != nil {
+		return NameFirstUpdateCmd{}, err
+	}
+	if err := json.Unmarshal(rawCmd.Params[2], &value); err != nil {
+		return NameFirstUpdateCmd{}, err
+	}
+
+	if len(rawCmd.Params) > 3 {
+		if err := json.Unmarshal(rawCmd.Params[3], &txId); err != nil {
+			return NameFirstUpdateCmd{}, err
+		}
+		params = append(params, txId)
+	}
+	if len(rawCmd.Params) > 4 {
+		if err := json.Unmarshal(rawCmd.Params[4], &toAddress); err != nil {
+			return NameFirstUpdateCmd{}, err
+		}
+		params = append(params, toAddress)
+	}
+
+	return NewNameFirstUpdateCmd(rawCmd.Id, name, rand, value, params)
+
+}
+
+// Id satisfies the Cmd interface by returning the id of the command.
+func (cmd NameFirstUpdateCmd) Id() interface{} {
+	return cmd.id
+}
+
+// Method satisfies the Cmd interface by returning the json method.
+func (cmd NameFirstUpdateCmd) Method() string {
+	return "name_firstupdate"
+}
+
+// MarshalJSON returns the JSON encoding of cmd. Part of the Cmd interface.
+func (cmd NameFirstUpdateCmd) MarshalJSON() ([]byte, error) {
+	params := make([]interface{}, 0, 5)
+	params = append(params, cmd.Name)
+	params = append(params, cmd.Rand)
+	if cmd.Txid != "" {
+		params = append(params, cmd.Txid)
+	}
+	params = append(params, cmd.Value)
+	if cmd.ToAddress != "" {
+		params = append(params, cmd.ToAddress)
+	}
+	raw, err := btcjson.NewRawCmd(cmd.id, cmd.Method(), params)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(raw)
+}
+
+// UnmarshalJSON unmarshals the JSON encoding of cmd into cmd. Part of the Cmd interface.
+func (cmd NameFirstUpdateCmd) UnmarshalJSON(b []byte) error {
+	var r btcjson.RawCmd
+	if err := json.Unmarshal(b, &r); err != nil {
+		return err
+	}
+	if len(r.Params) < 3 || len(r.Params) > 5 {
+		return btcjson.ErrWrongNumberOfParams
+	}
+	newCmd, err := NameFirstUpdateFromRaw(&r)
+	if err != nil {
+		return err
+	}
+	cmd = newCmd.(NameFirstUpdateCmd)
+	return nil
+}
+
 // NameShowCmd is a type handling custom marshaling and
 // unmarshaling of name_show JSON RPC commands.
 type NameShowCmd struct {

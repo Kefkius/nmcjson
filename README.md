@@ -29,6 +29,9 @@ nmcjson extends the [btcjson](https://github.com/btcsuite/btcjson) package with 
         }
 ```
 
+## Documentation
+
+Full `go doc` style documentation can be viewed online using the GoDoc site [here](http://godoc.org/github.com/kefkius/nmcjson).
 
 ## Installation
 
@@ -38,7 +41,7 @@ $ go get github.com/kefkius/nmcjson
 
 ## TODO
 
-- Identifier registration commands
+- Unit tests
 
 ## License
 
