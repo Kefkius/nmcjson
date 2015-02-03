@@ -21,16 +21,24 @@ type NameShowResult struct {
 	Name      string `json:"name"`
 	Value     string `json:"value"`
 	Txid      string `json:"txid"`
+	Vout      int    `json:"vout",omitempty`
 	Address   string `json:"address"`
+	Height    int64  `json:"height",omitempty`
 	ExpiresIn int64  `json:"expires_in"`
+	Expired   bool   `json:"expired",omitempty`
 }
 
 // NameListResult models the data from the name_list command.
 type NameListResult struct {
-	Name      string `json:"name"`
-	Value     string `json:"value"`
-	Address   string `json:"address"`
-	ExpiresIn int64  `json:"expires_in"`
+	Name        string `json:"name"`
+	Value       string `json:"value"`
+	Txid        string `json:"txid",omitempty`
+	Vout        int    `json:"vout",omitempty`
+	Address     string `json:"address"`
+	Height      int64  `json:"height",omitempty`
+	ExpiresIn   int64  `json:"expires_in"`
+	Expired     bool   `json:"expired",omitempty`
+	Transferred bool   `json:"transferred",omitempty"`
 }
 
 // NameHistoryResult models the data from the name_history command.
@@ -40,7 +48,12 @@ type NameHistoryResult NameShowResult
 type NameScanResult struct {
 	Name      string `json:"name"`
 	Value     string `json:"value"`
+	Txid      string `json:"txid",omitempty`
+	Vout      int    `json:"vout",omitempty`
+	Address   string `json:"address",omitempty`
+	Height    int64  `json:"height",omitempty`
 	ExpiresIn int64  `json:"expires_in"`
+	Expired   bool   `json:"expired",omitempty`
 }
 
 // NameFilterResult models the data from the name_filter command.
