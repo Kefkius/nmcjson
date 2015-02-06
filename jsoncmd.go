@@ -809,13 +809,11 @@ func (cmd NameFilterCmd) MarshalJSON() ([]byte, error) {
 	}
 	if cmd.MaxAge != 0 {
 		params = append(params, cmd.MaxAge)
+	} else {
+		params = append(params, 36000)
 	}
-	if cmd.From != 0 {
-		params = append(params, cmd.From)
-	}
-	if cmd.Nb != 0 {
-		params = append(params, cmd.Nb)
-	}
+	params = append(params, cmd.From)
+	params = append(params, cmd.Nb)
 	if cmd.Stat != 0 {
 		params = append(params, cmd.Stat)
 	}
