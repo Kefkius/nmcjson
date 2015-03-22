@@ -1,7 +1,7 @@
 package nmcjson
 
 import (
-	"github.com/btcsuite/btcjson"
+	"github.com/btcsuite/btcd/btcjson"
 )
 
 // Init registers the NMC-specific commands with btcjson.
